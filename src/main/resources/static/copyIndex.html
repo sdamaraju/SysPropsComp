@@ -1,0 +1,136 @@
+~
+<!-- Author: DAMAS -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>System Properties Comparator</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+ 
+<script>
+  
+function Error(errorString){
+       alert("Please check the following => "+errorString);
+       return 0;
+     }
+function myFunction() {
+var inventoryFile1 = document.querySelector('#path1');
+var errorString="";
+if ((inventoryFile1.value=="")||inventoryFile1.files[0].name.indexOf(".xml")== -1) {
+errorString=errorString+" -File 1 ";
+}
+var inventoryFile2 = document.querySelector('#path2');
+if ((inventoryFile2.value=="")||inventoryFile2.files[0].name.indexOf(".xml")==-1 ) {
+  errorString=errorString+" -File 2 ";
+}
+
+var inventoryFile3 = document.querySelector('#path3');
+if ((inventoryFile3.value=="")||inventoryFile3.files[0].name.indexOf(".xml")==-1 ) {
+  errorString=errorString+" -File 3 ";
+}
+
+if(errorString!="")
+{
+  Error(errorString);
+}
+else{
+    
+  var reader1 = new FileReader();
+  reader1.readAsText(inventoryFile1.files[0]);
+  var reader2 = new FileReader(); 
+  var reader3 = new FileReader();
+  
+   reader1.onloadend=function(e){
+    reader2.readAsText(inventoryFile2.files[0]);
+ reader2.onloadend=function(e){
+  reader3.readAsText(inventoryFile3.files[0]);
+  reader3.onloadend=function(e){
+ var ItemJSON;
+ ItemJSON =
+ {
+   "fileData1":"",
+   "fileData2":"",
+   "fileData3":""
+ };
+ ItemJSON.fileData1 = reader1.result;
+    ItemJSON.fileData2 = reader2.result;
+    ItemJSON.fileData3 = reader3.result;
+var ItemJSONFinal=JSON.stringify(ItemJSON);
+jQuery.ajax({
+            url: "http://localhost:8080/compareSystemProperties",
+            type: "POST",
+            data: ItemJSONFinal,
+         
+            contentType: 'application/json; charset=utf-8',
+            success: function(resultData) {
+            //resultData=resultData.replace(/\n/g,"<br><br>");
+            console.log(resultData);
+            document.getElementById("commonHotfix").innerHTML = resultData;// Current config with return type string
+            },
+            error : function(jqXHR, textStatus, errorThrown) {
+              document.getElementById("commonHotfix").innerHTML =errorThrown;        
+                 },
+            timeout: 120000,
+        });
+    }
+}}
+}
+}
+</script>
+</head>
+<body style="background: rgb(66, 115, 131);">
+
+<div class="jumbotron text-center">
+  <h1>System Properties Comparator</h1>
+  <p>Select the files to upload for comparison</p>
+</div>
+ 
+<div class="container"">
+  <div class="row">
+    <div class="col-sm-4">
+        <form>
+      <div class="center-block" style="margin-left:15%">
+       <h3 style="color:white" >Environment 1 <span style="color:red;font-weight:bold">*</span></h3>
+        <input type="file"  id="path1" accept=".xml" required><br>   
+      </div>
+    </form>
+    </div>
+    <div class="col-sm-4" >
+      <div class="center-block" style="margin-left:37%">
+        <h3 style="color:white">Environment 2 <span style="color:red"> *</span> </h3>
+        <form >
+          <input type="file" id="path2" accept=".xml" required><br>
+          </form>
+      </div>
+   </div>
+   <div class="col-sm-4" >
+      <div class="center-block" style="margin-left:67%">
+        <h3 style="color:white">Environment 3 <span style="color:red"> *</span> </h3>
+        <form >
+          <input type="file" id="path3" accept=".xml" required><br>
+          </form>
+      </div>
+   </div>
+</div>
+  </div>
+</div>
+<div style="height:50px">
+ 
+    <button type="Submit" class="btn btn-success"  onclick="myFunction()" style="margin-left:auto;margin-right:auto;display:block;margin-top:50px;" >Compare</button>
+ 
+</div>
+<div>
+<div id="commonHotfix" style="white-space: pre-line; text-align:center;margin-top:50px;color: aliceblue;font-style: white">
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+  var counter= 1;
+  var pegaResponseString="";
+  var preCounter=0;
+  function addNewInstance(){
+  
+  var div=document.createElement("div");
+  div.setAttribute("id",'insMain'+counter);
+  
+  div.innerHTML='<div id="insMain'+counter+'">';
+  div.innerHTML=document.getElementById("insMain0").innerHTML;
+   debugger;
+   var appendElementTo= 'insMain'+preCounter;
+ document.getElementById(appendElementTo).after(div);
+ counter++;
+ preCounter++;
+  }
+  var URL;
+  function getInstanceDetails(){
+  
+  for (var i=0; i<counter;i++ ){
+  URL[i]= document.getElementById("insMain"+i).childNodes[3].value;
+  }
+  
+  
+ // var ItemJSONFinal=JSON.stringify(ItemJSON);
+for (var i=0; i<counter;i++ ){
+	window.alert(URL[i]);
+ jQuery.ajax({
+            url: URL[i]+"/PRRestService/SP1/MyOrgE-kakul-Work/REST1",
+            type: "GET",
+			async:false,
+            //contentType: 'application/json; charset=utf-8',
+            success: function(resultData) {
+            //resultData=resultData.replace(/\n/g,"<br><br>");
+            pegaResponseString=pegaResponseString+resultData+"#####";
+			//document.getElementById("commonHotfix").innerHTML = resultData;// Current config with return type string
+            },
+            error : function(jqXHR, textStatus, errorThrown) {
+              document.getElementById("commonHotfix").innerHTML =errorThrown;         
+                 },
+
+            timeout: 120000,
+        });
+		//console.log(i+"  "+ pegaResponseString);
+  }
+  pegaResponseString=pegaResponseString.substring(0,pegaResponseString.length-5);
+  //console.log(pegaResponseString=pegaResponseString.substring(0,pegaResponseString.length-5));
+  var ItemJSON;
+	ItemJSON = 
+	{ 
+ 	 "fileData1":""
+	};
+	
+	console.log("CHECK1");
+	ItemJSON.fileData1 = pegaResponseString;
+	console.log(ItemJSON.fileData1);
+var ItemJSONFinal=JSON.stringify(ItemJSON);
+jQuery.ajax({
+            url: "http://localhost:8080/compareSystemProperties",
+            type: "POST",
+            data: ItemJSONFinal,
+         	async : false,
+            contentType: 'application/json; charset=utf-8',
+            success: function(resultData) {
+            //resultData=resultData.replace(/\n/g,"<br><br>");
+            console.log(resultData);
+            document.getElementById("commonHotfix").innerHTML = resultData;// Current config with return type string
+            },
+            error : function(jqXHR, textStatus, errorThrown) {
+              document.getElementById("commonHotfix").innerHTML =errorThrown;         
+                 },
+            timeout: 120000,
+        });
+  }
+  
+  
+  </script>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
+	<link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
+	<script src="js/modernizr.js"></script> <!-- Modernizr -->
+  	
+	<title>Pega System Information Comparator</title>
+</head>
+
+<body style="background: rgb(66, 115, 131);">
+
+<div class="jumbotron text-center">
+  <h2>Pega System Information Comparator </h2>
+  <p>Provide the instance URL</p> 
+</div>
+  
+<div class="container">
+  <div >
+    <div id="ins0" style="display:-webkit-box">
+        
+      <div id="insMain0" > 
+       <h3 style="color:white" >Instance  <span style="color:red;font-weight:bold">*</span></h3>
+        <input type="text"  id="path1" value="http://lkakulw7hyd:8736/prweb/" required>
+        <input type="button" id="next" value="Add" onclick="addNewInstance()" style="margin-right:50px"> 
+      </div>
+    
+    </div>
+    
+   
+</div>
+  </div>
+</div>
+
+<div style="height:50px">
+  
+    <button type="Submit" class="btn btn-success"  onclick="getInstanceDetails()" style="margin-left:auto;margin-right:auto;display:block;margin-top:100px;" >Compare</button>
+  
+</div>
+<div>
+
+
+<div id="commonHotfix" style="white-space: pre-line; text-align:left;margin-top:50px;color: aliceblue;font-style: white">
+  </div>
+</body>
+</html>
